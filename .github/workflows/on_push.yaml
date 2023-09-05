@@ -15,6 +15,8 @@ jobs:
         with:
           github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
           script: |
+            console.log(github);
+            console.log(github.actions);
             await github.actions.createWorkflowDispatch({
               owner: 'david-antoon-porjects',
               repo: 'dispatch-test',
