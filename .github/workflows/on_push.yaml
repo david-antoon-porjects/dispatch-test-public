@@ -11,7 +11,7 @@ jobs:
       - name: Set PR status to pending in RepoA
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.REPO_A_PAT }}
+          github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
           script: |
             const sha = context.payload.pull_request.number;
             await github.rest.repos.createCommitStatus({
