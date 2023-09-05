@@ -15,9 +15,7 @@ jobs:
         with:
           github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
           script: |
-            console.log(github);
-            console.log(github.actions);
-            await github.actions.createWorkflowDispatch({
+            await github.rest.actions.createWorkflowDispatch({
               owner: 'david-antoon-porjects',
               repo: 'dispatch-test',
               workflow_id: 'on_trigger.yaml',
@@ -35,7 +33,7 @@ jobs:
           script: |
             let status;
             while (true) {
-              const runs = await github.actions.listWorkflowRuns({
+              const runs = await github.rest.actions.listWorkflowRuns({
                 owner: 'david-antoon-porjects',
                 repo: 'dispatch-test',
                 workflow_id: 'on_trigger.yaml',
