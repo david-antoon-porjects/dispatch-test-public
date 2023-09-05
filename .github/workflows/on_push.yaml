@@ -13,6 +13,9 @@ jobs:
         with:
           github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
           script: |
+            console.log("github.sha", github.sha);
+            console.log("context", context);
+            console.log("context.payload.pull_request", context.payload.pull_request);
             const sha = context.payload.pull_request.number;
             await github.rest.repos.createCommitStatus({
               owner: 'david-antoon-porjects',
