@@ -14,7 +14,8 @@ jobs:
     with:
       github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
       version: "1"
-      secrets: inherit
+    secrets: inherit
+    
 #      - name: Trigger workflow in private repo
 #        uses: actions/github-script@v5
 #        with:
