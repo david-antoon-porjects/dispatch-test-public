@@ -52,5 +52,5 @@ jobs:
               }
             
               console.log("Workflow is still running. Waiting...");
-              await new Promise(resolve => setTimeout(resolve, 60000)); // Wait 60 seconds before polling again
+              await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 60 seconds before polling again
             }
