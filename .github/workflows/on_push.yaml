@@ -15,16 +15,16 @@ jobs:
         with:
           github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
           script: |
-            await github.rest.actions.createWorkflowDispatch({
+            const data = await github.rest.actions.createWorkflowDispatch({
               owner: 'david-antoon-porjects',
               repo: 'dispatch-test',
               workflow_id: 'on_trigger.yaml',
               ref: 'main',
               inputs: {
                 version: '1.0.0',
-                uid: '${{ steps.uid.outputs.timestamp }}'
               }
             });
+            console.log("result", data);
 
       - name: Wait for completion of the private repo workflow
         uses: actions/github-script@v5
