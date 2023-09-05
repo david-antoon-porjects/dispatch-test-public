@@ -1,21 +1,37 @@
-name: Trigger and Wait
+name: Trigger E2E tests
 
-on: push
+on:
+  pull_request:
+    types: ['opened', 'edited', 'reopened', 'synchronize']
 
 jobs:
-  trigger-and-wait:
+  create-status-check:
     runs-on: ubuntu-latest
     steps:
+      - name: Set PR status to pending in RepoA
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.REPO_A_PAT }}
+          script: |
+            const sha = context.payload.pull_request.number;
+            await github.rest.repos.createCommitStatus({
+              owner: 'david-antoon-porjects',
+              repo: 'RepoA-Name',
+              sha: sha,
+              state: 'pending',
+              description: 'Running E2E tests...',
+              context: 'frontegg/e2e-system-tests'
+            });
       - name: Generate unique ID
         id: uid
         run: echo "::set-output name=timestamp::$(date +%s)"
-  run-test:
-    uses: "david-antoon-porjects/dispatch-test/.github/workflows/on_trigger.yaml@main"
-    with:
-      github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
-      version: "1"
-    secrets: inherit
-    
+#  run-test:
+#    uses: "david-antoon-porjects/dispatch-test/.github/workflows/on_trigger.yaml@main"
+#    with:
+#      github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
+#      version: "1"
+#    secrets: inherit
+
 #      - name: Trigger workflow in private repo
 #        uses: actions/github-script@v5
 #        with:
