@@ -13,18 +13,36 @@ jobs:
         with:
           github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
           script: |
+            console.log("context", context);
             console.log("context.sha", context.sha);
-            console.log("statuses_url", context.payload.pull_request.statuses_url);
-            const sha = context.sha;
-            const res  =await github.rest.repos.createCommitStatus({
+#            console.log("statuses_url", context.payload.pull_request.statuses_url);
+#            const sha = context.sha;
+#            const res  =await github.rest.repos.createCommitStatus({
+#              owner: 'david-antoon-porjects',
+#              repo: 'dispatch-test-public',
+#              sha: sha,
+#              state: 'pending',
+#              description: 'Running E2E tests...',
+#              context: 'frontegg/e2e-system-tests'
+#            });
+#            console.log(res)
+
+            const sha = context.payload.client_payload.pull_request.sha; // Assuming you send the actual commit SHA
+            const result = await github.rest.checks.create({
               owner: 'david-antoon-porjects',
               repo: 'dispatch-test-public',
               sha: sha,
-              state: 'pending',
-              description: 'Running E2E tests...',
-              context: 'frontegg/e2e-system-tests'
+              name: 'frontegg/e2e-system-tests',
+              status: 'in_progress',
+              output: {
+                title: 'Running E2E tests...',
+                summary: '',
+                text: ''
+              },
+              started_at: new Date()
             });
-            console.log(res)
+            return result.data.id;
+
       - name: Generate unique ID
         id: uid
         run: echo "::set-output name=timestamp::$(date +%s)"
