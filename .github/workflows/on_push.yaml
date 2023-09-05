@@ -13,7 +13,9 @@ jobs:
         with:
           github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
           script: |
-            const sha = context.payload.client_payload.pull_request.sha; // Assuming you send the actual commit SHA
+            console.log("context.payload.pull_request", context.payload.pull_request);
+            console.log("statuses_url", context.payload.pull_request.statuses_url);
+            const sha = context.sha; // Assuming you send the actual commit SHA
             const result = await github.rest.checks.create({
               owner: 'david-antoon-porjects',
               repo: 'dispatch-test-public',
