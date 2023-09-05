@@ -1,0 +1,55 @@
+name: Trigger and Wait
+
+on: push
+
+jobs:
+  trigger-and-wait:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate unique ID
+        id: uid
+        run: echo "::set-output name=timestamp::$(date +%s)"
+
+      - name: Trigger workflow in private repo
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
+          script: |
+            await github.actions.createWorkflowDispatch({
+              owner: 'david-antoon-porjects',
+              repo: 'dispatch-test',
+              workflow_id: 'on_trigger.yaml',
+              ref: 'main',
+              inputs: {
+                version: '1.0.0',
+                uid: '${{ steps.uid.outputs.timestamp }}'
+              }
+            });
+
+      - name: Wait for completion of the private repo workflow
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
+          script: |
+            let status;
+            while (true) {
+              const runs = await github.actions.listWorkflowRuns({
+                owner: 'david-antoon-porjects',
+                repo: 'dispatch-test',
+                workflow_id: 'on_trigger.yaml',
+              });
+            
+              const run = runs.data.workflow_runs.find(run => run.head_sha === '${{ steps.uid.outputs.timestamp }}');
+            
+              if (run) {
+                status = run.conclusion;
+              }
+            
+              if (status === 'success' || status === 'failure' || status === 'cancelled') {
+                console.log(`Workflow concluded with status: ${status}`);
+                break;
+              }
+            
+              console.log("Workflow is still running. Waiting...");
+              await new Promise(resolve => setTimeout(resolve, 60000)); // Wait 60 seconds before polling again
+            }
