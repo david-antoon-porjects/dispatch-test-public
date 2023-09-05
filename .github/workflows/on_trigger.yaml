@@ -1,0 +1,14 @@
+name: Manual Dispatch Workflow
+
+on: push
+
+jobs:
+  echo_version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Trigger private repo
+        run: echo "Dispatching event to private repo"
+
