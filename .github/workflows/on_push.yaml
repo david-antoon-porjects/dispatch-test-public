@@ -9,12 +9,12 @@ jobs:
       - name: Generate unique ID
         id: uid
         run: echo "::set-output name=timestamp::$(date +%s)"
-  e2e-test:
-    uses: david-antoon-porjects/dispatch-test/.github/workflows/on_trigger.yaml@main
-    with:
-#      github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
-      version: "1"
-    secrets: inherit
+      - name: "run"
+        uses: "david-antoon-porjects/dispatch-test/.github/workflows/on_trigger.yaml@main"
+        with:
+          github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
+          version: "1"
+          secrets: inherit
 #      - name: Trigger workflow in private repo
 #        uses: actions/github-script@v5
 #        with:
