@@ -16,7 +16,7 @@ jobs:
             const sha = context.payload.pull_request.number;
             await github.rest.repos.createCommitStatus({
               owner: 'david-antoon-porjects',
-              repo: 'RepoA-Name',
+              repo: 'dispatch-test-public',
               sha: sha,
               state: 'pending',
               description: 'Running E2E tests...',
