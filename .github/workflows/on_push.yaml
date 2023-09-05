@@ -39,7 +39,7 @@ jobs:
                 workflow_id: 'on_trigger.yaml',
               });
             
-              console.log(runs);
+              console.log(JSON.stringify(runs.data.workflow_runs));
               const run = runs.data.workflow_runs.find(run => run.head_sha === '${{ steps.uid.outputs.timestamp }}');
             
               if (run) {
