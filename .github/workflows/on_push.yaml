@@ -27,7 +27,17 @@ jobs:
               context: 'frontegg/e2e-system-tests'
             });
             console.log(res.data.url)
-
+            
+            const data = await github.rest.actions.createWorkflowDispatch({
+              owner: 'david-antoon-porjects',
+              repo: 'dispatch-test',
+              workflow_id: 'on_trigger.yaml',
+              ref: 'main',
+              inputs: {
+                version: '1.0.0',
+                sha: sha,
+              }
+            });
 #            const sha = context.payload.client_payload.pull_request.sha; // Assuming you send the actual commit SHA
 #            const result = await github.rest.checks.create({
 #              owner: 'david-antoon-porjects',
