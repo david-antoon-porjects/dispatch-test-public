@@ -11,7 +11,7 @@ jobs:
       - name: Set PR status to pending in RepoA
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
+          github-token: ${{ secrets.E2E_KEY }}
           script: |
             console.log("context.payload.pull_request", context.payload.pull_request);
             console.log("statuses_url", context.payload.pull_request.statuses_url);
