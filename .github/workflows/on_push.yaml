@@ -53,6 +53,7 @@ jobs:
       - name: "Cat package.json"
         run: |
           cat ./client-app/client-app-vite/package.json
+
       - name: "Download artifact"
         uses: actions/download-artifact@v3
         with:
@@ -60,12 +61,12 @@ jobs:
           path: ./client-app/client-app-vite/package.json
         continue-on-error: true
 
-      - name: "Download artifact"
-        uses: actions/download-artifact@v3
+      - name: "Download versioned package json if exists"
+        uses: ./.github/actions/download-if-exists
         with:
           name: "versioned-package-json"
           path: ./client-app/client-app-vite/package.json
-        continue-on-error: true
+
       - name: "Cat package.json"
         run: |
           cat ./client-app/client-app-vite/package.json

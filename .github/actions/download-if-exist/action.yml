@@ -1,0 +1,78 @@
+name: Download If exists
+description: Example, Download Package Json if exists in artifact
+inputs:
+  name:
+    description: "Artifact name"
+    required: true
+  path:
+    description: "File path"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Check file existence
+      id: check_files
+      uses: andstor/file-existence-action@v1
+      with:
+        files: "assets/${{ env.URL }}"
+
+    - name: "File exists"
+      if: steps.check_files.outputs.files_exists == 'true'
+      shell: bash
+      run: echo "It exists !"
+
+    - name: "Save old file as tmp"
+      uses: actions/github-script@v5
+      env:
+        FILE_PATH: ${{ inputs.path }}
+        FILE_NAME: ${{ inputs.name }}
+      with:
+        script: |
+          const {FILE_PATH, FILE_NAME} = process.env;
+          const io = require('@actions/io');
+          await io.mv(FILE_PATH, `${FILE_PATH}.tmp`);
+
+    - name: "Save old file as tmp"
+      uses: actions/github-script@v5
+      env:
+        file_path: ${{ inputs.path }}
+      with:
+        script: |
+          const {file_path} = process.env;
+          const fs = require('fs');
+          fs.renameSync(file_path, `${file_path}.tmp`);
+
+    - name: "Download artifact is available"
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ inputs.name }}
+        path: ${{ inputs.path }}
+      continue-on-error: true
+
+    - name: "Save old file as tmp"
+      uses: actions/github-script@v5
+      env:
+        file_path: ${{ inputs.path }}
+      with:
+        script: |
+          const {file_path} = process.env;
+          const io = require('@actions/io');
+          await io.mv(file_path, `${file_path}.tmp`);
+
+    - name: "Restore original file if no artifact"
+      uses: actions/github-script@v5
+      env:
+        file_path: ${{ inputs.path }}
+      with:
+        script: |
+          const { file_path } = process.env
+          const fs = require('fs');
+          if (fs.existsSync(file_path)) {
+            console.log('Successfully downloaded artifact');
+          } else {
+            console.log('Restoring original file');
+            fs.renameSync(`${file_path}.tmp`, file_path);
+          }
+          
