@@ -13,20 +13,18 @@ jobs:
         with:
           github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
           script: |
-            console.log("context", context);
-            console.log("context.sha", context.sha);
-            console.log("statuses_url", context.payload.pull_request.statuses_url);
-            // const sha = context.sha;
             const sha = context.payload.after;
+            const repo = context.payload.repository.name
+            const dispatch_id = `${repo}/${sha}`;
+            
             const res = await github.rest.repos.createCommitStatus({
               owner: 'david-antoon-porjects',
-              repo: 'dispatch-test-public',
+              repo: repo,
               sha: sha,
               state: 'pending',
-              description: 'Running E2E tests...',
+              description: 'Starting E2E tests...',
               context: 'frontegg/e2e-system-tests'
             });
-            console.log(res.data.url)
             
             const data = await github.rest.actions.createWorkflowDispatch({
               owner: 'david-antoon-porjects',
@@ -35,71 +33,6 @@ jobs:
               ref: 'main',
               inputs: {
                 version: '1.0.0',
-                sha: sha,
+                dispatch_id,
               }
             });
-#            const sha = context.payload.client_payload.pull_request.sha; // Assuming you send the actual commit SHA
-#            const result = await github.rest.checks.create({
-#              owner: 'david-antoon-porjects',
-#              repo: 'dispatch-test-public',
-#              sha: sha,
-#              name: 'frontegg/e2e-system-tests',
-#              status: 'in_progress',
-#              started_at: new Date()
-#            });
-#            return result.data.id;
-
-      - name: Generate unique ID
-        id: uid
-        run: echo "::set-output name=timestamp::$(date +%s)"
-#  run-test:
-#    uses: "david-antoon-porjects/dispatch-test/.github/workflows/on_trigger.yaml@main"
-#    with:
-#      github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
-#      version: "1"
-#    secrets: inherit
-
-#      - name: Trigger workflow in private repo
-#        uses: actions/github-script@v5
-#        with:
-#          github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
-#          script: |
-#            const data = await github.rest.actions.createWorkflowDispatch({
-#              owner: 'david-antoon-porjects',
-#              repo: 'dispatch-test',
-#              workflow_id: 'on_trigger.yaml',
-#              ref: 'main',
-#              inputs: {
-#                version: '1.0.0',
-#              }
-#            });
-#            console.log("result", data);
-#
-#      - name: Wait for completion of the private repo workflow
-#        uses: actions/github-script@v5
-#        with:
-#          github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
-#          script: |
-#            let status;
-#            while (true) {
-#              const runs = await github.rest.actions.listWorkflowRuns({
-#                owner: 'david-antoon-porjects',
-#                repo: 'dispatch-test',
-#                workflow_id: 'on_trigger.yaml',
-#              });
-#
-#              console.log(JSON.stringify(runs.data.workflow_runs));
-#              const run = runs.data.workflow_runs.find(run => run.head_sha === '${{ steps.uid.outputs.timestamp }}');
-#
-#              if (run) {
-#                status = run.conclusion;
-#              }
-#
-#              if (status === 'success' || status === 'failure' || status === 'cancelled') {
-#                console.log(`Workflow concluded with status: ${status}`);
-#                break;
-#              }
-#
-#              console.log("Workflow is still running. Waiting...");
-#              await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 60 seconds before polling again
-#            }
