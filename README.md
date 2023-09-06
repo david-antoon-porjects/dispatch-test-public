@@ -1,3 +1,3 @@
 # dispatch-test-public
 
-trigger change 3
+trigger change 4
