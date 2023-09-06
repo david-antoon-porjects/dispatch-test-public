@@ -18,7 +18,7 @@ jobs:
             const fs = require('fs');
             const dependencyName = '@frontegg/react';
             const dispatchId = process.env.DISPATCH_ID;
-            const version = process.env.VERSION;
+            const newVersion = process.env.VERSION;
 
             // Load the package.json file
             const packageJsonPath = './client-app/client-app-vite/package.json';
