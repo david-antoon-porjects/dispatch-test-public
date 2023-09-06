@@ -5,32 +5,96 @@ jobs:
   create-status-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Set PR status to pending in RepoA
+      - name: "Checkout"
+        uses: actions/checkout@v3
+
+      - name: "Prepare test project"
         uses: actions/github-script@v5
+        env:
+          VERSION: "111"
+          DISPATCH_ID: "1111"
         with:
-          github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
-          script: |
-            console.log(context.payload)
-            const sha = context.payload.after;
-            const repo = context.payload.repository.name
-            const dispatch_id = `${repo}/${sha}`;
-            
-            const res = await github.rest.repos.createCommitStatus({
-              owner: 'david-antoon-porjects',
-              repo: repo,
-              sha: sha,
-              state: 'pending',
-              description: 'Dispatching E2E tests...',
-              context: 'frontegg/e2e-system-tests'
-            });
-            
-            const data = await github.rest.actions.createWorkflowDispatch({
-              owner: 'david-antoon-porjects',
-              repo: 'dispatch-test',
-              workflow_id: 'on_trigger.yaml',
-              ref: 'main',
-              inputs: {
-                version: '1.0.0',
-                dispatch_id,
-              }
-            });
+          script:
+            const fs = require('fs');
+            const dependencyName = '@frontegg/react';
+            const dispatchId = process.env.DISPATCH_ID;
+            const version = process.env.VERSION;
+
+            // Load the package.json file
+            const packageJsonPath = './client-app/client-app-vite/package.json';
+            const packageData = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+
+            // Save dispatch Id for later use
+            packageData.dispatchId = dispatchId;
+
+            // Check if the dependency exists
+            if (packageData.dependencies && packageData.dependencies[dependencyName]) {
+              packageData.dependencies[dependencyName] = newVersion;
+              fs.writeFileSync(packageJsonPath, JSON.stringify(packageData, null, 2));
+              console.log(`Updated ${dependencyName} to version ${newVersion}`);
+            } else {
+              console.error(`Dependency ${dependencyName} not found in package.json`);
+              process.exit(1);
+            }
+
+      - name: "Upload updated package.json"
+        uses: actions/upload-artifact@v3
+        with:
+          name: "versioned-package-json"
+          path: ./client-app/client-app-vite/package.json
+
+
+  check-artfifact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Cat package.json"
+        run: |
+          cat ./client-app/client-app-vite/package.json
+      - name: "Download artifact"
+        uses: actions/download-artifact@v3
+        with:
+          name: "versioned-packagssssse-json"
+          path: ./client-app/client-app-vite/package.json
+        continue-on-error: true
+
+      - name: "Download artifact"
+        uses: actions/download-artifact@v3
+        with:
+          name: "versioned-package-json"
+          path: ./client-app/client-app-vite/package.json
+        continue-on-error: true
+      - name: "Cat package.json"
+        run: |
+          cat ./client-app/client-app-vite/package.json
+
+
+#      - name: Set PR status to pending in RepoA
+#        uses: actions/github-script@v5
+#        with:
+#          github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
+#          script: |
+#            const sha = context.payload.after;
+#            const repo = context.payload.repository.name
+#            const dispatch_id = `${repo}/${sha}`;
+#
+#            const res = await github.rest.repos.createCommitStatus({
+#              owner: 'david-antoon-porjects',
+#              repo: repo,
+#              sha: sha,
+#              state: 'pending',
+#              description: 'Dispatching E2E tests...',
+#              context: 'frontegg/e2e-system-tests'
+#            });
+#
+#            const data = await github.rest.actions.createWorkflowDispatch({
+#              owner: 'david-antoon-porjects',
+#              repo: 'dispatch-test',
+#              workflow_id: 'on_trigger.yaml',
+#              ref: 'main',
+#              inputs: {
+#                version: '1.0.0',
+#                dispatch_id,
+#              }
+#            });
