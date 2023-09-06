@@ -22,7 +22,7 @@ jobs:
               repo: repo,
               sha: sha,
               state: 'pending',
-              description: 'Starting E2E tests...',
+              description: 'Dispatching E2E tests...',
               context: 'frontegg/e2e-system-tests'
             });
             
