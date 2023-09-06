@@ -57,16 +57,20 @@ jobs:
       - name: "Download artifact"
         uses: actions/download-artifact@v3
         with:
-          name: "versioned-packagssssse-json"
-          path: ./client-app/client-app-vite/
+          name: "versioned-package-json"
+          path: ./client-app/client-app-vite
         continue-on-error: true
+
+      - name: "Cat package.json"
+        run: |
+          cat ./client-app/client-app-vite/package.json
 
       - name: "Download versioned package json if exists"
         uses: ./.github/actions/download-if-exist
         with:
           artifactName: "versioned-package-json"
           fileName: "package.json"
-          directory: ./client-app/client-app-vite/
+          directory: ./client-app/client-app-vite
 
       - name: "Cat package.json"
         run: |
