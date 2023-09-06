@@ -62,7 +62,7 @@ jobs:
         continue-on-error: true
 
       - name: "Download versioned package json if exists"
-        uses: ./.github/actions/download-if-exists
+        uses: ./.github/actions/download-if-exist
         with:
           name: "versioned-package-json"
           path: ./client-app/client-app-vite/package.json
