@@ -64,8 +64,9 @@ jobs:
       - name: "Download versioned package json if exists"
         uses: ./.github/actions/download-if-exist
         with:
-          name: "versioned-package-json"
-          path: ./client-app/client-app-vite/
+          artifactName: "versioned-package-json"
+          fileName: "package.json"
+          directory: ./client-app/client-app-vite/
 
       - name: "Cat package.json"
         run: |

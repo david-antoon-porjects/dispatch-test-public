@@ -1,11 +1,14 @@
 name: Download If exists
 description: Example, Download Package Json if exists in artifact
 inputs:
-  name:
-    description: "Artifact name"
+  artifactName:
+    description: "Uploaded artifact name"
     required: true
-  path:
-    description: "File path"
+  fileName:
+    description: "File name"
+    required: true
+  directory:
+    description: "File directory path"
     required: true
 
 runs:
@@ -14,31 +17,31 @@ runs:
     - name: "Save old file as tmp"
       uses: actions/github-script@v5
       env:
-        file_path: ${{ inputs.path }}
+        filePath: "${{ inputs.directory }}/${{ inputs.fileName }}"
       with:
         script: |
-          const {file_path} = process.env;
-          await io.mv(file_path, `${file_path}.tmp`);
+          const {filePath} = process.env;
+          await io.mv(filePath, `${filePath}.tmp`);
       continue-on-error: true
 
     - name: "Download artifact is available"
       uses: actions/download-artifact@v3
       with:
-        name: ${{ inputs.name }}
-        path: ${{ inputs.path }}
+        name: ${{ inputs.artifactName }}
+        path: ${{ inputs.directory }}
       continue-on-error: true
 
     - name: "Restore original file if no artifact"
       uses: actions/github-script@v5
       env:
-        file_path: ${{ inputs.path }}
+        filePath: "${{ inputs.directory }}/${{ inputs.fileName }}"
       with:
         script: |
-          const { file_path } = process.env
-          if (require('fs').existsSync(file_path)) {
-            console.log('Successfully downloaded artifact');
+          const { filePath } = process.env
+          if (require('fs').existsSync(filePath)) {
+            console.log(`Successfully downloaded artifact to ${filePath}`);
           } else {
-            console.log('Restoring original file');
-            await io.mv(`${file_path}.tmp`, file_path);
+            console.log('Restoring original file: ${filePath}');
+            await io.mv(`${filePath}.tmp`, filePath);
           }
           
