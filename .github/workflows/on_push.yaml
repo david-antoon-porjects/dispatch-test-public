@@ -11,25 +11,32 @@ jobs:
       - name: Set PR status to pending in RepoA
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.E2E_KEY }}
+          github-token: ${{ secrets.PRIVATE_REPO_ACCESS }}
           script: |
-            console.log("context.payload.pull_request", context.payload.pull_request);
+            console.log("context", context);
+            console.log("context.sha", context.sha);
             console.log("statuses_url", context.payload.pull_request.statuses_url);
-            const sha = context.sha; // Assuming you send the actual commit SHA
-            const result = await github.rest.checks.create({
+            const sha = context.sha;
+            const res = await github.rest.repos.createCommitStatus({
               owner: 'david-antoon-porjects',
               repo: 'dispatch-test-public',
               sha: sha,
-              name: 'frontegg/e2e-system-tests',
-              status: 'in_progress',
-              output: {
-                title: 'Running E2E tests...',
-                summary: '',
-                text: ''
-              },
-              started_at: new Date()
+              state: 'pending',
+              description: 'Running E2E tests...',
+              context: 'frontegg/e2e-system-tests'
             });
-            return result.data.id;
+            console.log(res)
+
+#            const sha = context.payload.client_payload.pull_request.sha; // Assuming you send the actual commit SHA
+#            const result = await github.rest.checks.create({
+#              owner: 'david-antoon-porjects',
+#              repo: 'dispatch-test-public',
+#              sha: sha,
+#              name: 'frontegg/e2e-system-tests',
+#              status: 'in_progress',
+#              started_at: new Date()
+#            });
+#            return result.data.id;
 
       - name: Generate unique ID
         id: uid
